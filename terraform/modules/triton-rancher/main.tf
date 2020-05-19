@@ -102,7 +102,7 @@ resource "null_resource" "setup_rancher_k8s" {
   depends_on = [null_resource.install_rancher_master]
 
   # Changes to any instance of the cluster requires re-provisioning
-  triggers {
+  triggers = {
     rancher_master_id = "local.rancher_master_id"
   }
 
