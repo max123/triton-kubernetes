@@ -82,9 +82,7 @@ resource "null_resource" "install_rancher_master" {
   }
 
   provisioner "remote-exec" {
-    inline = <<EOF
-      ${data.template_file.install_rancher_master.rendered}
-      EOF
+    inline = ["${data.template_file.install_rancher_master.rendered}"]
   }
 }
 
