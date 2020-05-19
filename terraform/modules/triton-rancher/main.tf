@@ -1,10 +1,10 @@
 provider "triton" {
   version = "~> 0.7.0"
 
-  account      = "${var.triton_account}"
+  account      = "var.triton_account"
   key_material = "${file(var.triton_key_path)}"
-  key_id       = "${var.triton_key_id}"
-  url          = "${var.triton_url}"
+  key_id       = "var.triton_key_id"
+  url          = "var.triton_url"
 }
 
 data "triton_network" "networks" {
@@ -13,21 +13,21 @@ data "triton_network" "networks" {
 }
 
 data "triton_image" "image" {
-  name    = "${var.triton_image_name}"
-  version = "${var.triton_image_version}"
+  name    = "var.triton_image_name"
+  version = "var.triton_image_version"
 }
 
 resource "triton_machine" "rancher_master" {
-  package = "${var.master_triton_machine_package}"
+  package = "var.master_triton_machine_package"
   image   = "${data.triton_image.image.id}"
-  name    = "${var.name}"
+  name    = "var.name"
 
   user_script = "${data.template_file.install_docker.rendered}"
 
   networks = ["${data.triton_network.networks.*.id}"]
 
   cns = {
-    services = ["${var.name}"]
+    services = ["var.name"]
   }
 
   affinity = ["role!=~gcm"]
@@ -40,30 +40,30 @@ resource "triton_machine" "rancher_master" {
 locals {
   rancher_master_id = "${triton_machine.rancher_master.id}"
   rancher_master_ip = "${triton_machine.rancher_master.primaryip}"
-  ssh_user          = "${var.triton_ssh_user}"
-  key_path          = "${var.triton_key_path}"
+  ssh_user          = "var.triton_ssh_user"
+  key_path          = "var.triton_key_path"
 }
 
 data "template_file" "install_docker" {
   template = "${file("${path.module}/files/install_docker_rancher.sh.tpl")}"
 
-  vars {
-    docker_engine_install_url = "${var.docker_engine_install_url}"
+  vars = {
+    docker_engine_install_url = "var.docker_engine_install_url"
 
-    rancher_server_image      = "${var.rancher_server_image}"
-    rancher_registry          = "${var.rancher_registry}"
-    rancher_registry_username = "${var.rancher_registry_username}"
-    rancher_registry_password = "${var.rancher_registry_password}"
+    rancher_server_image      = "var.rancher_server_image"
+    rancher_registry          = "var.rancher_registry"
+    rancher_registry_username = "var.rancher_registry_username"
+    rancher_registry_password = "var.rancher_registry_password"
   }
 }
 
 data "template_file" "install_rancher_master" {
   template = "${file("${path.module}/files/install_rancher_master.sh.tpl")}"
 
-  vars {
-    rancher_server_image      = "${var.rancher_server_image}"
-    rancher_registry          = "${var.rancher_registry}"
-    rancher_registry_username = "${var.rancher_registry_username}"
+  vars = {
+    rancher_server_image      = "var.rancher_server_image"
+    rancher_registry          = "var.rancher_registry"
+    rancher_registry_username = "var.rancher_registry_username"
     rancher_registry_password = "${var.rancher_registry_password}"
   }
 }
@@ -91,17 +91,17 @@ resource "null_resource" "install_rancher_master" {
 data "template_file" "setup_rancher_k8s" {
   template = "${file("${path.module}/files/setup_rancher.sh.tpl")}"
 
-  vars {
-    name                  = "${var.name}"
+  vars = {
+    name                  = "var.name"
     rancher_host          = "https://127.0.0.1"
     host_registration_url = "https://${local.rancher_master_ip}"
 
-    rancher_admin_password = "${var.rancher_admin_password}"
+    rancher_admin_password = "var.rancher_admin_password"
   }
 }
 
 resource "null_resource" "setup_rancher_k8s" {
-  depends_on = ["null_resource.install_rancher_master"]
+  depends_on = [null_resource.install_rancher_master]
 
   # Changes to any instance of the cluster requires re-provisioning
   triggers {
