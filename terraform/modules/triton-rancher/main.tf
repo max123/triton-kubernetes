@@ -114,9 +114,7 @@ resource "null_resource" "setup_rancher_k8s" {
   }
 
   provisioner "remote-exec" {
-    inline = <<EOF
-      ${data.template_file.setup_rancher_k8s.rendered}
-      EOF
+    inline = ["${data.template_file.setup_rancher_k8s.rendered}"]
   }
 }
 
