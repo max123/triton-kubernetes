@@ -2,7 +2,7 @@ provider "triton" {
   version = "~> 0.7.0"
 
   account      = "var.triton_account"
-  key_material = "${file(var.triton_key_path)}"
+  key_material = "file(var.triton_key_path)"
   key_id       = "var.triton_key_id"
   url          = "var.triton_url"
 }
@@ -19,27 +19,27 @@ data "triton_image" "image" {
 
 resource "triton_machine" "rancher_master" {
   package = "var.master_triton_machine_package"
-  image   = "${data.triton_image.image.id}"
+  image   = "data.triton_image.image.id"
   name    = "var.name"
 
-  user_script = "${data.template_file.install_docker.rendered}"
+  user_script = "data.template_file.install_docker.rendered"
 
-  networks = ["${data.triton_network.networks.*.id}"]
+  networks = ["data.triton_network.networks.*.id"]
 
-  cns = {
+  cns {
     services = ["var.name"]
   }
 
   affinity = ["role!=~gcm"]
 
-  tags = {
+  tags {
     role = "gcm"
   }
 }
 
 locals {
-  rancher_master_id = "${triton_machine.rancher_master.id}"
-  rancher_master_ip = "${triton_machine.rancher_master.primaryip}"
+  rancher_master_id = "triton_machine.rancher_master.id"
+  rancher_master_ip = "triton_machine.rancher_master.primaryip"
   ssh_user          = "var.triton_ssh_user"
   key_path          = "var.triton_key_path"
 }
@@ -64,21 +64,21 @@ data "template_file" "install_rancher_master" {
     rancher_server_image      = "var.rancher_server_image"
     rancher_registry          = "var.rancher_registry"
     rancher_registry_username = "var.rancher_registry_username"
-    rancher_registry_password = "${var.rancher_registry_password}"
+    rancher_registry_password = "var.rancher_registry_password"
   }
 }
 
 resource "null_resource" "install_rancher_master" {
   # Changes to any instance of the cluster requires re-provisioning
   triggers {
-    rancher_master_id = "${local.rancher_master_id}"
+    rancher_master_id = "local.rancher_master_id"
   }
 
   connection {
     type        = "ssh"
-    user        = "${local.ssh_user}"
-    host        = "${local.rancher_master_ip}"
-    private_key = "${file(local.key_path)}"
+    user        = "local.ssh_user"
+    host        = "local.rancher_master_ip"
+    private_key = "file(local.key_path)"
   }
 
   provisioner "remote-exec" {
@@ -105,13 +105,13 @@ resource "null_resource" "setup_rancher_k8s" {
 
   # Changes to any instance of the cluster requires re-provisioning
   triggers {
-    rancher_master_id = "${local.rancher_master_id}"
+    rancher_master_id = "local.rancher_master_id"
   }
 
   connection {
     type        = "ssh"
-    user        = "${local.ssh_user}"
-    host        = "${local.rancher_master_ip}"
+    user        = "local.ssh_user"
+    host        = "local.rancher_master_ip"
     private_key = "${file(local.key_path)}"
   }
 
@@ -129,10 +129,10 @@ data "external" "rancher_server" {
   program = ["bash", "${path.module}/files/rancher_server.sh"]
 
   query = {
-    id        = "${null_resource.setup_rancher_k8s.id}" // used to create an implicit dependency
-    ssh_host  = "${local.rancher_master_ip}"
-    ssh_user  = "${local.ssh_user}"
-    key_path  = "${local.key_path}"
+    id        = "null_resource.setup_rancher_k8s.id" // used to create an implicit dependency
+    ssh_host  = "local.rancher_master_ip"
+    ssh_user  = "local.ssh_user"
+    key_path  = "local.key_path"
     file_path = "~/rancher_api_key"
   }
 }
