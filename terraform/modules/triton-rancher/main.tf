@@ -32,7 +32,7 @@ resource "triton_machine" "rancher_master" {
 
   affinity = ["role!=~gcm"]
 
-  tags {
+  tags = {
     role = "gcm"
   }
 }
@@ -70,7 +70,7 @@ data "template_file" "install_rancher_master" {
 
 resource "null_resource" "install_rancher_master" {
   # Changes to any instance of the cluster requires re-provisioning
-  triggers {
+  triggers = {
     rancher_master_id = "local.rancher_master_id"
   }
 
@@ -112,7 +112,7 @@ resource "null_resource" "setup_rancher_k8s" {
     type        = "ssh"
     user        = "local.ssh_user"
     host        = "local.rancher_master_ip"
-    private_key = "${file(local.key_path)}"
+    private_key = "file(local.key_path)"
   }
 
   provisioner "remote-exec" {
