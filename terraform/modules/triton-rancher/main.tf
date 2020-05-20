@@ -2,7 +2,7 @@ provider "triton" {
   version = "~> 0.7.0"
 
   account      = "var.triton_account"
-  key_material = "file(var.triton_key_path)"
+  key_material = "${file(var.triton_key_path)}"
   key_id       = "var.triton_key_id"
   url          = "var.triton_url"
 }
@@ -78,7 +78,7 @@ resource "null_resource" "install_rancher_master" {
     type        = "ssh"
     user        = "local.ssh_user"
     host        = "local.rancher_master_ip"
-    private_key = "file(local.key_path)"
+    private_key = "${file(local.key_path)}"
   }
 
   provisioner "remote-exec" {
@@ -110,7 +110,7 @@ resource "null_resource" "setup_rancher_k8s" {
     type        = "ssh"
     user        = "local.ssh_user"
     host        = "local.rancher_master_ip"
-    private_key = "file(local.key_path)"
+    private_key = "${file(local.key_path)}"
   }
 
   provisioner "remote-exec" {
