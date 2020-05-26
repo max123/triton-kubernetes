@@ -1,6 +1,7 @@
 package compute
 
 import (
+       "fmt"
 	triton "github.com/joyent/triton-go"
 	"github.com/joyent/triton-go/client"
 )
@@ -19,6 +20,7 @@ func newComputeClient(client *client.Client) *ComputeClient {
 // resources within CloudAPI
 func NewClient(config *triton.ClientConfig) (*ComputeClient, error) {
 	// TODO: Utilize config interface within the function itself
+	fmt.Printf("%+v\n",config)
 	client, err := client.New(config.TritonURL, config.MantaURL, config.AccountName, config.Signers...)
 	if err != nil {
 		return nil, err

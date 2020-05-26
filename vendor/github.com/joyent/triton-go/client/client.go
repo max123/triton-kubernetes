@@ -81,6 +81,7 @@ func New(tritonURL string, mantaURL string, accountName string, signers ...authe
 		AccountName: accountName,
 	}
 
+
 	// Default to constructing an SSHAgentSigner if there are no other signers
 	// passed into NewClient and there's an TRITON_KEY_ID and SSH_AUTH_SOCK
 	// available in the user's environ(7).
@@ -90,7 +91,9 @@ func New(tritonURL string, mantaURL string, accountName string, signers ...authe
 		}
 	}
 
+	fmt.Printf("%+v\n",newClient)
 	return newClient, nil
+	
 }
 
 var envPrefixes = []string{"TRITON", "SDC"}
